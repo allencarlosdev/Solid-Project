@@ -1,61 +1,80 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Proyecto Laravel: Implementación con Sail, TDD y Principios SOLID
+Este es un proyecto Laravel configurado con Laravel Sail como entorno de desarrollo local en Docker. La finalidad es desarrollar una aplicación sencilla pero implementando buenas prácticas de código, permitiendo que otros desarrolladores puedan revisar el código y apreciar la calidad del mismo a través de:
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+✅ Test-Driven Development (TDD)
+✅ Principios SOLID aplicados
+✅ Arquitectura limpia y mantenible
+✅ Code standards y convenciones de Laravel
+✅ Documentación clara del código
 
-## About Laravel
+## Requisitos Previos
+Docker (Instalado)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Instalación
+**1. Clonar el proyecto**
+```bash
+    git clone git@github.com:allencarlosdev/Solid-Project.git
+```
+**2. Entrar al proyecto**
+```bash
+    cd Solid-Project
+```
+**3. Configurar variables de entorno**
+   En la consola agregas lo siguiente:
+```bash
+cp .env.example .env
+```
+**4. Configuras las variables de entorno**
+```bash
+    DB_CONNECTION=
+    DB_HOST=
+    DB_PORT=
+    DB_DATABASE=
+    DB_USERNAME=
+    DB_PASSWORD=
+```
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**5. Instalas la Imagen de sail 8.4 e instala las dependencias en el contenedor**
+    Esto lo colocas en tu consola :
+```bash
+    docker run --rm \
+        -u "$(id -u):$(id -g)" \
+        -v "$(pwd):/var/www/html" \
+        -w /var/www/html \
+        laravelsail/php84-composer:latest \
+        composer install --ignore-platform-reqs
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**6. Levantas los contenedores del Proyecto en Docker**
+    Esto lo colocas en tu consola :
+```bash
+./vendor/bin/sail up -d
+```
 
-## Learning Laravel
+**6.1 Cambiar el alias ( Opcional )**
+    Esto lo colocas en tu consola :
+```bash
+    echo 'alias sail="./vendor/bin/sail"' >> ~/.bashrc
+    source ~/.bashrc
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**7 Generar una nueva Key**
+    Esto lo colocas en tu consola :
+```bash
+sail artisan key:generate
+```
+**8 Migrar las tablas de la base de datos**
+    Esto lo colocas en tu consola :
+```bash
+sail artisan migrate
+```
+**9 El proyecto de laravel ya esta en marcha**
+    Esto lo colocas en tu browser :
+    (http://localhost:8083)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+A continuación se documentará el progreso del desarrollo, incluyendo la metodología SCRUM, avances en funcionalidades y capturas del proyecto en desarrollo.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
