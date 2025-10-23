@@ -1,11 +1,12 @@
 # Proyecto Laravel: Implementación con Sail, TDD y Principios SOLID
 Este es un proyecto Laravel configurado con Laravel Sail como entorno de desarrollo local en Docker. La finalidad es desarrollar una aplicación sencilla pero implementando buenas prácticas de código, permitiendo que otros desarrolladores puedan revisar el código y apreciar la calidad del mismo a través de:
 
-✅ Test-Driven Development (TDD)
-✅ Principios SOLID aplicados
-✅ Arquitectura limpia y mantenible
-✅ Code standards y convenciones de Laravel
-✅ Documentación clara del código
+
+- ✅ **Test-Driven Development (TDD)**
+- ✅ **Principios SOLID aplicados**
+- ✅ **Arquitectura limpia y mantenible**
+- ✅ **Code standards y convenciones de Laravel**
+- ✅ **Documentación clara del código**
 
 ## Requisitos Previos
 Docker (Instalado)
@@ -77,4 +78,6 @@ sail artisan migrate
 
 A continuación se documentará el progreso del desarrollo, incluyendo la metodología SCRUM, avances en funcionalidades y capturas del proyecto en desarrollo.
 
+**Ejemplo SCRUM:**
 
+![SCRUM Screenshot](https://github.com/allencarlosdev/Solid-Project/tree/main/public/img/scrum_screenshoot.png)
