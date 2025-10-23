@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Book extends Model
 {
@@ -40,6 +41,14 @@ class Book extends Model
     {
         if (empty($this->authors)) return null;
         return implode(', ', $this->authors);
+    }
+
+    /**
+     * Relación muchos a muchos con BookCollection
+     */
+    public function collections(): BelongsToMany
+    {
+        return $this->belongsToMany(BookCollection::class)->withTimestamps();
     }
 
 }
