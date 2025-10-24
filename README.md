@@ -80,4 +80,4 @@ A continuación se documentará el progreso del desarrollo, incluyendo la metodo
 
 **Ejemplo SCRUM:**
 
-![SCRUM Screenshot](https://github.com/allencarlosdev/Solid-Project/tree/main/public/img/scrum_screenshoot.png)
+![SCRUM Screenshot](https://raw.githubusercontent.com/allencarlosdev/Solid-Project/refs/heads/main/public/img/scrum_screenshoot.png)
