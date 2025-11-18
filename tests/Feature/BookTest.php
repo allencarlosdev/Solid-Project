@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use PHPUnit\Framework\Attributes\Test;
 use App\Models\Book;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Http;
 
 class BookTest extends TestCase
 {
@@ -18,16 +19,39 @@ class BookTest extends TestCase
     #[test]
     public function index_book(): void
     {
-        // Crear algunos libros en la base de datos
-        Book::factory()->count(3)->create();
+        // ARRANGE: Definir la respuesta simulada de Google Books API
+        // Usamos una estructura que imita el JSON real de Google Books
+        $mockedApiResponse = [
+            'kind' => 'books#volumes',
+            'totalItems' => 100,
+            'items' => [
+                [
+                    'id' => '1',
+                    'volumeInfo' => [
+                        'title' => 'The Great Gatsby',
+                        'authors' => ['F. Scott Fitzgerald'],
+                        'publisher' => 'Scribner',
+                        'publishedDate' => '1925',
+                        'imageLinks' => ['thumbnail' => 'http://example.com/gatsby.jpg'],
+                    ],
+                ],
+            ],
+        ];
 
-        // Solicitar la ruta de índice de libros
+        // ARRANGE: Falsificar (Mock) la llamada HTTP
+        // Esto intercepta cualquier llamada saliente de Http::get(...)
+        Http::fake([
+            'https://www.googleapis.com/books/v1/volumes*' => Http::response($mockedApiResponse, 200),
+        ]);
+
+        // ACT: Solicitar la ruta de índice de libros
         $response = $this->get('/books');
 
-        // Verificar que la respuesta sea exitosa
+        // ASSERT: Verificar que la respuesta sea exitosa
         $response->assertStatus(200);
 
-        $response->assertSeeText(Book::first()->title);
+        // Verificar que el título simulado (y no un título de DB) esté presente en la respuesta
+        $response->assertSeeText('The Great Gatsby');
     }
 
     #[test]
