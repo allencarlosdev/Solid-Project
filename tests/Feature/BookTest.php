@@ -55,32 +55,37 @@ class BookTest extends TestCase
     }
 
     #[test]
-    public function store_book(): void
+    public function show_book(): void
     {
-        // Arrange: datos que vendrían desde Google API
-        $payload = [
-            'title' => 'Clean Architecture',
-            'authors' => ['Robert C. Martin'],
-            'isbn' => '9780134494166',
-            'external_id' => 'google-abc123',
-            'published_year' => 2017,
-            'publisher' => 'Pearson',
-            'cover_url' => 'http://example.com/cover.jpg',
-            'description' => 'A book about clean architecture principles.'
+        $bookId = 'aC9EAAAAMAAJ';
+        $bookTitle = 'Test Driven Development: By Example';
+        
+        // ARRANGE: Definir la respuesta simulada para un solo libro
+        $mockedShowResponse = [
+            'kind' => 'books#volume',
+            'id' => $bookId,
+            'volumeInfo' => [
+                'title' => $bookTitle,
+                'authors' => ['Kent Beck'],
+                'description' => 'A famous book about TDD.',
+                'imageLinks' => ['large' => 'http://example.com/tdd.jpg'],
+            ],
         ];
 
-        // Act: enviamos el POST a la ruta de almacenamiento
-        $response = $this->post('/books', $payload);
-
-        // Assert: respuesta correcta
-        $response->assertStatus(302); // redirige después de guardar
-
-        // Assert: el libro se almacenó
-        $this->assertDatabaseHas('books', [
-            'external_id' => 'google-abc123',
-            'title' => strtolower('Clean Architecture'),
+        // ARRANGE: Falsificar (Mock) la llamada HTTP específica para la URL de detalle
+        Http::fake([
+            "https://www.googleapis.com/books/v1/volumes/{$bookId}*" => Http::response($mockedShowResponse, 200),
         ]);
+
+        // ACT: Solicitar la ruta de detalle del libro
+        $response = $this->get("/books/{$bookId}");
+
+        // ASSERT: Verificar que la respuesta sea exitosa
+        $response->assertStatus(200);
+
+        // Verificar que los datos clave del libro simulado estén presentes en la vista
+        $response->assertSeeText($bookTitle);
+        $response->assertSeeText('Kent Beck');
+        $response->assertSeeText('A famous book about TDD.');
     }
-
-
 }
