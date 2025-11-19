@@ -7,6 +7,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
- // CRUD - Book
+ // API- Book
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
-Route::post('/books', [BookController::class, 'store'])->name('books.store');
+Route::get('/books/{id}', [BookController::class, 'show'])->name('books.show');
