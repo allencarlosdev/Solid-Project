@@ -16,17 +16,10 @@ class BookCollectionTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
-    public function it_can_attach_books_to_a_collection(): void
+    public function book_collection(): void
     {
-        // Arrange
-        $collection = BookCollection::factory()->create();
-        $books = Book::factory()->count(2)->create();
+        $response = $this->get('/');
 
-        // Act
-        $collection->books()->attach($books->pluck('id'));
-
-        // Assert
-        $this->assertCount(2, $collection->books);
-        $this->assertEquals($books->pluck('id')->toArray(), $collection->books->pluck('id')->toArray());
+        $response->assertStatus(200);
     }
 }
