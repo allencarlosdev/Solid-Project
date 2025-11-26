@@ -21,5 +21,5 @@
     @endforelse
     </ul>
 
-    {{ $books->links() }}
+    {{ $books->links()}}
 </x-app-layout>
