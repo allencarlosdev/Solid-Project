@@ -19,7 +19,7 @@
             @include('layouts.navigation')
 
             <!-- Page Content -->
-            <main>
+            <main class="bg-[#FAD1A7]">
                 {{ $slot }}
             </main>
         </div>
