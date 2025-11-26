@@ -37,7 +37,7 @@
                 @if (Route::has('login'))
                     <nav class="flex items-center justify-end gap-4 text-sm">
                         @auth
-                            <a href="{{ url('/dashboard') }}" class="text-white hover: transition duration-300">Dashboard</a>
+                            <a href="{{ url('/books') }}" class="text-white hover: transition duration-300">Books</a>
                         @else
                             <a href="{{ route('login') }}" class="text-white hover:text-gray-300 transition duration-300">Log in</a>
 
