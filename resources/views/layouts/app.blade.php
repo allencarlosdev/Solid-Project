@@ -15,11 +15,11 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-white">
+        <div class="min-h-screen bg-white flex flex-col">
             @include('layouts.navigation')
 
             <!-- Page Content -->
-            <main class="bg-[#FAD1A7]">
+            <main class="bg-[#FAD1A7] flex-1">
                 {{ $slot }}
             </main>
         </div>
