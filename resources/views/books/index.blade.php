@@ -5,6 +5,71 @@
                 <div class="p-6 text-gray-900">
                     <h1 class="text-3xl font-bold text-[#3A271B] mb-8">Catálogo de Libros</h1>
                     
+                    <!-- Search Form -->
+                    <div class="mb-8 bg-gradient-to-r from-[#FAD1A7]/20 to-[#e6c196]/20 rounded-lg p-6 border border-[#FAD1A7]/30">
+                        <form method="GET" action="{{ route('books') }}" class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Search by Title -->
+                                <div>
+                                    <label for="search_title" class="block text-sm font-semibold text-[#3A271B] mb-2">
+                                        <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                        </svg>
+                                        Buscar por Título
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="search_title" 
+                                        name="search_title" 
+                                        value="{{ request('search_title') }}"
+                                        placeholder="Ej: Clean Code, The Pragmatic Programmer..."
+                                        class="w-full px-4 py-2.5 border border-[#3A271B]/20 rounded-lg focus:ring-2 focus:ring-[#FAD1A7] focus:border-[#FAD1A7] transition-all"
+                                    />
+                                </div>
+                                
+                                <!-- Search by Author -->
+                                <div>
+                                    <label for="search_author" class="block text-sm font-semibold text-[#3A271B] mb-2">
+                                        <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                        </svg>
+                                        Buscar por Autor
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="search_author" 
+                                        name="search_author" 
+                                        value="{{ request('search_author') }}"
+                                        placeholder="Ej: Robert Martin, Martin Fowler..."
+                                        class="w-full px-4 py-2.5 border border-[#3A271B]/20 rounded-lg focus:ring-2 focus:ring-[#FAD1A7] focus:border-[#FAD1A7] transition-all"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="flex flex-wrap gap-3 justify-end">
+                                <a 
+                                    href="{{ route('books') }}" 
+                                    class="px-6 py-2.5 bg-white border-2 border-[#3A271B]/20 text-[#3A271B] rounded-lg hover:bg-gray-50 transition-all font-semibold flex items-center gap-2"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                    Limpiar Filtros
+                                </a>
+                                <button 
+                                    type="submit" 
+                                    class="px-6 py-2.5 bg-[#3A271B] text-white rounded-lg hover:bg-[#2a1f15] transition-all font-semibold flex items-center gap-2 shadow-md hover:shadow-lg"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                    Buscar Libros
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
                     @if($books->count() > 0)
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
                             @foreach($books as $book)

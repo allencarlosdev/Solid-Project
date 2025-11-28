@@ -26,8 +26,23 @@ class BookController extends Controller
         $apiUrl = 'https://www.googleapis.com/books/v1/volumes';
         $apiKey = config('services.google_books.key');
         
-        // Define tu consulta de búsqueda (q).
-        $query = 'coding'; 
+        // Obtener parámetros de búsqueda
+        $searchTitle = $request->get('search_title', '');
+        $searchAuthor = $request->get('search_author', '');
+        
+        // Construir la consulta de búsqueda dinámicamente
+        $queryParts = [];
+        
+        if (!empty($searchTitle)) {
+            $queryParts[] = 'intitle:' . $searchTitle;
+        }
+        
+        if (!empty($searchAuthor)) {
+            $queryParts[] = 'inauthor:' . $searchAuthor;
+        }
+        
+        // Si no hay búsqueda específica, usar una consulta por defecto
+        $query = !empty($queryParts) ? implode('+', $queryParts) : 'coding';
 
         // Realizar la petición HTTP a la API
         $response = Http::get($apiUrl, [
