@@ -63,12 +63,23 @@ class BookController extends Controller
             // Mapear los datos para adaptarlos si es necesario
             $booksData = collect($items)->map(function ($item) {
                 $volumeInfo = $item['volumeInfo'];
+                
+                // Obtener la mejor imagen disponible para el catálogo
+                $coverUrl = $volumeInfo['imageLinks']['medium'] ?? 
+                            $volumeInfo['imageLinks']['small'] ?? 
+                            $volumeInfo['imageLinks']['thumbnail'] ?? null;
+                
+                // Convertir http:// a https:// para evitar problemas de contenido mixto
+                if ($coverUrl) {
+                    $coverUrl = str_replace('http://', 'https://', $coverUrl);
+                }
+                
                 return [
                     'title' => $volumeInfo['title'] ?? 'N/A',
                     'authors' => $volumeInfo['authors'] ?? ['N/A'],
                     'publisher' => $volumeInfo['publisher'] ?? 'N/A',
                     'publishedDate' => $volumeInfo['publishedDate'] ?? 'N/A',
-                    'cover_url' => $volumeInfo['imageLinks']['thumbnail'] ?? null,
+                    'cover_url' => $coverUrl,
                     'external_id' => $item['id'] ?? null,
                     'description' => $volumeInfo['description'] ?? 'No descripción disponible.',
                 ];
@@ -92,7 +103,6 @@ class BookController extends Controller
             // \Log::error('Error fetching books from Google API: ' . $response->body());
         }
 
-        // Retornar la vista con el objeto Paginator
         return view('books.index', ['books' => $books]);
     }
 
@@ -110,12 +120,34 @@ class BookController extends Controller
             $item = $response->json();
             $volumeInfo = $item['volumeInfo'] ?? [];
 
+            // Debug: Ver qué tipos de imágenes están disponibles
+            // if (isset($volumeInfo['imageLinks'])) {
+            //     dd([
+            //         'available_image_types' => array_keys($volumeInfo['imageLinks']),
+            //         'all_imageLinks' => $volumeInfo['imageLinks'],
+            //         'book_title' => $volumeInfo['title'] ?? 'N/A'
+            //     ]);
+            // } else {
+            //     dd('No imageLinks available for this book');
+            // }
+
+            // Obtener la mejor imagen disponible
+            $coverUrl = $volumeInfo['imageLinks']['large'] ?? 
+                        $volumeInfo['imageLinks']['medium'] ?? 
+                        $volumeInfo['imageLinks']['small'] ?? 
+                        $volumeInfo['imageLinks']['thumbnail'] ?? null;
+            
+            // Convertir http:// a https:// para evitar problemas de contenido mixto
+            if ($coverUrl) {
+                $coverUrl = str_replace('http://', 'https://', $coverUrl);
+            }
+
             $book = [
                 'title' => $volumeInfo['title'] ?? 'N/A',
                 'authors' => $volumeInfo['authors'] ?? ['N/A'],
                 'publisher' => $volumeInfo['publisher'] ?? 'N/A',
                 'publishedDate' => $volumeInfo['publishedDate'] ?? 'N/A',
-                'cover_url' => $volumeInfo['imageLinks']['large'] ?? $volumeInfo['imageLinks']['thumbnail'] ?? null,
+                'cover_url' => $coverUrl,
                 'description' => $volumeInfo['description'] ?? 'No descripción disponible.',
                 'external_id' => $item['id'] ?? $id,
             ];
@@ -123,7 +155,6 @@ class BookController extends Controller
             return view('books.show', ['book' => $book]);
         }
         
-        // Manejar el caso de no encontrado o error
         abort(404, 'Libro no encontrado en Google Books API.');
     }
 }
