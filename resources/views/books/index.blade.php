@@ -73,10 +73,13 @@
                     @if($books->count() > 0)
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-5">
                             @foreach($books as $book)
-                                <div class="group relative cursor-pointer items-center justify-center overflow-hidden transition-shadow hover:shadow-xl hover:shadow-black/30 rounded-lg" x-data="{ isFavorited: false }">
+                                @php
+                                    $isBookFavorited = in_array($book['external_id'], $favoritedBookIds);
+                                @endphp
+                                <div class="group relative cursor-pointer items-center justify-center overflow-hidden transition-shadow hover:shadow-xl hover:shadow-black/30 rounded-lg" x-data="{ isFavorited: {{ $isBookFavorited ? 'true' : 'false' }} }">
                                     <!-- Favorite Button (Heart Icon) -->
                                     <button 
-                                        @click.stop="isFavorited = !isFavorited; toggleFavorite('{{ $book['external_id'] }}')"
+                                        @click.stop="async () => { const result = await toggleFavorite('{{ $book['external_id'] }}'); if (result !== null) isFavorited = result; }"
                                         class="absolute top-3 right-3 z-10 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all transform hover:scale-110"
                                     >
                                         <svg 
@@ -196,9 +199,6 @@
                     <!-- Create New Collection Section -->
                     <div class="mb-6 pb-6 border-b border-gray-200">
                         <h4 class="text-sm font-semibold text-[#3A271B] mb-3 flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                            </svg>
                             Nueva Colección
                         </h4>
                         <div class="flex gap-2">
@@ -232,7 +232,7 @@
                         <div class="space-y-2">
                             <!-- Favorites Collection (Always present, cannot be deleted) -->
                             <button 
-                                @click="addToCollection('favorites')"
+                                @click="async () => { const result = await toggleFavorite(currentBookId); if (result !== null) { showCollectionModal = false; showMessage('Libro agregado a favoritos'); } }"
                                 class="w-full flex items-center justify-between p-3 bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-200 rounded-lg hover:border-red-300 transition-all group"
                             >
                                 <div class="flex items-center gap-3">
@@ -244,50 +244,25 @@
                                 <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded">Predeterminada</span>
                             </button>
 
-                            {{-- Dynamic User Collections - TODO: Replace with actual data from backend --}}
-                            {{-- Example structure for when implementing CRUD:
-                            @foreach($userCollections as $collection)
+                            {{-- Dynamic User Collections --}}
+                            <template x-for="collection in collections" :key="collection.id">
                                 <button 
-                                    @click="addToCollection('{{ $collection->id }}')"
+                                    @click="addToCollection(collection.id)"
                                     class="w-full flex items-center justify-between p-3 bg-gray-50 border-2 border-gray-200 rounded-lg hover:border-[#FAD1A7] hover:bg-[#FAD1A7]/10 transition-all group"
                                 >
                                     <div class="flex items-center gap-3">
                                         <svg class="w-5 h-5 text-[#3A271B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
                                         </svg>
-                                        <span class="font-semibold text-gray-700">{{ $collection->name }}</span>
+                                        <span class="font-semibold text-gray-700" x-text="collection.name"></span>
                                     </div>
-                                    <span class="text-xs text-gray-500">{{ $collection->books_count }} libros</span>
+                                    <span class="text-xs text-gray-500" x-text="collection.books_count + ' libros'"></span>
                                 </button>
-                            @endforeach
-                            --}}
+                            </template>
 
-                            <!-- Example User Collections (Will be dynamic from backend) -->
-                            <button 
-                                @click="addToCollection('1')"
-                                class="w-full flex items-center justify-between p-3 bg-gray-50 border-2 border-gray-200 rounded-lg hover:border-[#FAD1A7] hover:bg-[#FAD1A7]/10 transition-all group"
-                            >
-                                <div class="flex items-center gap-3">
-                                    <svg class="w-5 h-5 text-[#3A271B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-                                    </svg>
-                                    <span class="font-semibold text-gray-700">Programación</span>
-                                </div>
-                                <span class="text-xs text-gray-500">5 libros</span>
-                            </button>
-
-                            <button 
-                                @click="addToCollection('2')"
-                                class="w-full flex items-center justify-between p-3 bg-gray-50 border-2 border-gray-200 rounded-lg hover:border-[#FAD1A7] hover:bg-[#FAD1A7]/10 transition-all group"
-                            >
-                                <div class="flex items-center gap-3">
-                                    <svg class="w-5 h-5 text-[#3A271B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-                                    </svg>
-                                    <span class="font-semibold text-gray-700">Ciencia Ficción</span>
-                                </div>
-                                <span class="text-xs text-gray-500">3 libros</span>
-                            </button>
+                            <div x-show="collections.length === 0" class="text-center py-4 text-gray-500 text-sm">
+                                No tienes colecciones aún. ¡Crea una!
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -304,61 +279,22 @@
             </div>
         </div>
 
-        <!-- Create Collection Modal -->
+        <!-- Toast Notification -->
         <div 
-            x-show="showCreateModal" 
+            x-show="showToast" 
             x-cloak
-            @click.self="showCreateModal = false"
-            class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform translate-y-2"
+            x-transition:enter-end="opacity-100 transform translate-y-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed bottom-4 right-4 z-50 bg-[#3A271B] text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2"
         >
-            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all">
-                <!-- Modal Header -->
-                <div class="bg-gradient-to-r from-[#3A271B] to-[#2a1f15] px-6 py-4 rounded-t-2xl">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-                            </svg>
-                            Crear Nueva Colección
-                        </h3>
-                        <button @click="showCreateModal = false" class="text-white hover:text-[#FAD1A7] transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Modal Body -->
-                <div class="p-6">
-                    <label for="standalone-collection-name" class="block text-sm font-semibold text-[#3A271B] mb-2">
-                        Nombre de la Colección
-                    </label>
-                    <input 
-                        type="text" 
-                        x-model="standaloneCollectionName"
-                        placeholder="Ej: Mis libros favoritos, Para leer..."
-                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FAD1A7] focus:border-[#FAD1A7] transition-all"
-                        @keydown.enter="createStandaloneCollection()"
-                    />
-                </div>
-
-                <!-- Modal Footer -->
-                <div class="bg-gray-50 px-6 py-4 rounded-b-2xl flex justify-end gap-3">
-                    <button 
-                        @click="showCreateModal = false"
-                        class="px-6 py-2 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-all font-semibold"
-                    >
-                        Cancelar
-                    </button>
-                    <button 
-                        @click="createStandaloneCollection()"
-                        class="px-6 py-2 bg-[#3A271B] text-white rounded-lg hover:bg-[#2a1f15] transition-all font-semibold"
-                    >
-                        Crear Colección
-                    </button>
-                </div>
-            </div>
+            <svg class="w-5 h-5 text-[#FAD1A7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span x-text="toastMessage"></span>
         </div>
     </div>
 
@@ -369,63 +305,132 @@
                 // State
                 activeCollection: 'all',
                 showCollectionModal: false,
-                showCreateModal: false,
                 currentBookId: null,
                 newCollectionName: '',
-                standaloneCollectionName: '',
+                collections: @json($userCollections),
+                toastMessage: '',
+                showToast: false,
 
                 // Methods
                 switchCollection(collectionId) {
                     this.activeCollection = collectionId;
-                    console.log('Switching to collection:', collectionId);
-                    // TODO: Load books from this collection
+                    window.location.href = `/book-collections/${collectionId}`;
                 },
 
                 openCollectionModal(bookId) {
                     this.currentBookId = bookId;
                     this.showCollectionModal = true;
                     this.newCollectionName = '';
-                    console.log('Opening modal for book:', bookId);
                 },
 
-                addToCollection(collectionId) {
-                    console.log('Adding book', this.currentBookId, 'to collection', collectionId);
-                    // TODO: Send AJAX request to add book to collection
-                    
-                    this.showCollectionModal = false;
-                    alert('Libro agregado a la colección exitosamente');
-                },
+                async addToCollection(collectionId) {
+                    if (!this.currentBookId) {
+                        this.showMessage('Error: No se ha seleccionado ningún libro');
+                        return;
+                    }
 
-                createAndAddToCollection() {
-                    if (this.newCollectionName.trim()) {
-                        console.log('Creating new collection:', this.newCollectionName, 'and adding book:', this.currentBookId);
-                        // TODO: Send AJAX request to create collection and add book
+                    try {
+                        const response = await fetch(`/book-collections/${collectionId}/books`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                book_external_id: this.currentBookId
+                            })
+                        });
+
+                        const data = await response.json();
                         
-                        this.newCollectionName = '';
-                        this.showCollectionModal = false;
-                        alert('Colección creada y libro agregado exitosamente');
-                    } else {
-                        alert('Por favor ingresa un nombre para la colección');
+                        if (data.success) {
+                            this.showCollectionModal = false;
+                            this.showMessage(data.message || 'Libro agregado exitosamente');
+                            // Refresh collections count
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            this.showMessage('Error al agregar el libro');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        this.showMessage('Error al agregar el libro a la colección');
                     }
                 },
 
-                createStandaloneCollection() {
-                    if (this.standaloneCollectionName.trim()) {
-                        console.log('Creating standalone collection:', this.standaloneCollectionName);
-                        // TODO: Send AJAX request to create collection
+                async createAndAddToCollection() {
+                    if (!this.newCollectionName.trim()) {
+                        this.showMessage('Por favor ingresa un nombre para la colección');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/book-collections', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                name: this.newCollectionName,
+                                book_external_id: this.currentBookId
+                            })
+                        });
+
+                        const data = await response.json();
                         
-                        this.standaloneCollectionName = '';
-                        this.showCreateModal = false;
-                        alert('Colección creada exitosamente');
-                    } else {
-                        alert('Por favor ingresa un nombre para la colección');
+                        if (data.success) {
+                            this.collections.push(data.collection);
+                            this.newCollectionName = '';
+                            this.showCollectionModal = false;
+                            this.showMessage(data.message || 'Colección creada y libro agregado exitosamente');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            this.showMessage('Error al crear la colección');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        this.showMessage('Error al crear la colección');
                     }
                 },
 
-                toggleFavorite(bookId) {
-                    // Note: isFavorited is managed in each book card's x-data
-                    console.log('Toggling favorite for book:', bookId);
-                    // TODO: Send AJAX request to toggle favorite status
+                async toggleFavorite(bookId) {
+                    try {
+                        const response = await fetch('/favorites/toggle', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                book_external_id: bookId
+                            })
+                        });
+
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.showMessage(data.message);
+                            return data.favorited;
+                        } else {
+                            this.showMessage('Error al actualizar favoritos');
+                            return null;
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        this.showMessage('Error al actualizar favoritos');
+                        return null;
+                    }
+                },
+
+                showMessage(message) {
+                    this.toastMessage = message;
+                    this.showToast = true;
+                    setTimeout(() => {
+                        this.showToast = false;
+                    }, 3000);
                 }
             }
         }

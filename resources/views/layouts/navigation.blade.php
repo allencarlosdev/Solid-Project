@@ -1,4 +1,4 @@
-<nav x-data="{ open: false, showCreateModal: false, newCollectionName: '', activeCollection: 'all' }" class="bg-[#3A271B] border-b border-[#3A271B]">
+<nav x-data="navigationData()" class="bg-[#3A271B] border-b border-[#3A271B]">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -12,67 +12,57 @@
 
                 <!-- Navigation Links with Collections -->
                 <div class="hidden space-x-4 sm:-my-px sm:ms-10 sm:flex items-center">
-                    @php
-                    $classes = request()->routeIs('books')
-                                ? 'inline-flex items-center px-1 pt-1 border-b-2 border-[#FAD1A7] text-sm font-medium leading-5 text-white focus:outline-none focus:border-[#FAD1A7] transition duration-150 ease-in-out'
-                                : 'inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-white hover:text-[#FAD1A7] hover:border-gray-300 focus:outline-none focus:text-[#FAD1A7] focus:border-gray-300 transition duration-150 ease-in-out';
-                    @endphp
-                    
                     <!-- Books / All Books -->
-                    <a href="{{ route('books') }}" class="{{ $classes }}">
+                    <a href="{{ route('books') }}" 
+                       class="{{ request()->routeIs('books') 
+                                ? 'inline-flex items-center px-1 pt-1 border-b-2 border-[#FAD1A7] text-sm font-medium leading-5 text-white focus:outline-none focus:border-[#FAD1A7] transition duration-150 ease-in-out'
+                                : 'inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-white hover:text-[#FAD1A7] hover:border-gray-300 focus:outline-none focus:text-[#FAD1A7] focus:border-gray-300 transition duration-150 ease-in-out' }}">
                         <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                         </svg>
                         {{ __('Books') }}
                     </a>
 
-                    @if(request()->routeIs('books'))
-                        <!-- Favorites -->
-                        <button 
-                            @click="activeCollection = 'favorites'"
-                            :class="activeCollection === 'favorites' ? 'border-[#FAD1A7]' : 'border-transparent hover:border-gray-300'"
-                            class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 text-white hover:text-[#FAD1A7] focus:outline-none transition duration-150 ease-in-out"
-                        >
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                            </svg>
-                            Favoritos
-                        </button>
+                    <!-- Favorites -->
+                    <a 
+                        href="{{ route('favorites') }}"
+                        class="{{ request()->routeIs('favorites') 
+                                ? 'inline-flex items-center px-1 pt-1 border-b-2 border-[#FAD1A7] text-sm font-medium leading-5 text-white focus:outline-none focus:border-[#FAD1A7] transition duration-150 ease-in-out'
+                                : 'inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-white hover:text-[#FAD1A7] hover:border-gray-300 focus:outline-none transition duration-150 ease-in-out' }}"
+                    >
+                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        Favoritos
+                    </a>
 
-                        <!-- Example Collections -->
-                        <button 
-                            @click="activeCollection = '1'"
-                            :class="activeCollection === '1' ? 'border-[#FAD1A7]' : 'border-transparent hover:border-gray-300'"
-                            class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 text-white hover:text-[#FAD1A7] focus:outline-none transition duration-150 ease-in-out"
-                        >
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-                            </svg>
-                            Programación
-                        </button>
-
-                        <button 
-                            @click="activeCollection = '2'"
-                            :class="activeCollection === '2' ? 'border-[#FAD1A7]' : 'border-transparent hover:border-gray-300'"
-                            class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 text-white hover:text-[#FAD1A7] focus:outline-none transition duration-150 ease-in-out"
-                        >
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-                            </svg>
-                            Ciencia Ficción
-                        </button>
-
-                        <!-- Create New Collection Button -->
-                        <button 
-                            @click="showCreateModal = true"
-                            class="inline-flex items-center px-3 py-1.5 bg-[#FAD1A7] text-[#3A271B] text-sm font-semibold rounded-md hover:bg-[#e6c196] transition-all"
-                        >
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                            </svg>
-                            Nueva
-                        </button>
+                    <!-- Dynamic User Collections -->
+                    @if(isset($userCollections))
+                        @foreach($userCollections as $collection)
+                            <a 
+                                href="{{ route('book-collections.show', $collection->id) }}"
+                                class="{{ request()->routeIs('book-collections.show') && request()->route('bookCollection')?->id == $collection->id
+                                        ? 'inline-flex items-center px-1 pt-1 border-b-2 border-[#FAD1A7] text-sm font-medium leading-5 text-white focus:outline-none focus:border-[#FAD1A7] transition duration-150 ease-in-out'
+                                        : 'inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-white hover:text-[#FAD1A7] hover:border-gray-300 focus:outline-none transition duration-150 ease-in-out' }}"
+                            >
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                                </svg>
+                                {{ $collection->name }}
+                            </a>
+                        @endforeach
                     @endif
+
+                    <!-- Create New Collection Button -->
+                    <button 
+                        @click="showCreateModal = true"
+                        class="inline-flex items-center px-3 py-1.5 bg-[#FAD1A7] text-[#3A271B] text-sm font-semibold rounded-md hover:bg-[#e6c196] transition-all"
+                    >
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Nueva
+                    </button>
                 </div>
             </div>
 
@@ -125,67 +115,57 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            @php
-            $responsiveClasses = request()->routeIs('books')
-                        ? 'block w-full ps-3 pe-4 py-2 border-l-4 border-[#FAD1A7] text-start text-base font-medium text-[#FAD1A7] bg-[#4e3424] focus:outline-none focus:text-[#FAD1A7] focus:bg-[#4e3424] focus:border-[#FAD1A7] transition duration-150 ease-in-out'
-                        : 'block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium text-white hover:text-[#FAD1A7] hover:bg-[#4e3424] hover:border-gray-300 focus:outline-none focus:text-[#FAD1A7] focus:bg-[#4e3424] focus:border-gray-300 transition duration-150 ease-in-out';
-            @endphp
-            
             <!-- Books / All Books -->
-            <a href="{{ route('books') }}" class="{{ $responsiveClasses }}">
+            <a href="{{ route('books') }}" 
+               class="{{ request()->routeIs('books')
+                        ? 'block w-full ps-3 pe-4 py-2 border-l-4 border-[#FAD1A7] text-start text-base font-medium text-[#FAD1A7] bg-[#4e3424] focus:outline-none focus:text-[#FAD1A7] focus:bg-[#4e3424] focus:border-[#FAD1A7] transition duration-150 ease-in-out'
+                        : 'block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium text-white hover:text-[#FAD1A7] hover:bg-[#4e3424] hover:border-gray-300 focus:outline-none focus:text-[#FAD1A7] focus:bg-[#4e3424] focus:border-gray-300 transition duration-150 ease-in-out' }}">
                 <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                 </svg>
                 {{ __('Books') }}
             </a>
 
-            @if(request()->routeIs('books'))
-                <!-- Favorites -->
-                <button 
-                    @click="activeCollection = 'favorites'"
-                    :class="activeCollection === 'favorites' ? 'border-[#FAD1A7] text-[#FAD1A7] bg-[#4e3424]' : 'border-transparent text-white hover:text-[#FAD1A7] hover:bg-[#4e3424]'"
-                    class="block w-full ps-3 pe-4 py-2 border-l-4 text-start text-base font-medium focus:outline-none transition duration-150 ease-in-out"
-                >
-                    <svg class="inline-block w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
-                    Favoritos
-                </button>
+            <!-- Favorites -->
+            <a 
+                href="{{ route('favorites') }}"
+                class="{{ request()->routeIs('favorites')
+                        ? 'block w-full ps-3 pe-4 py-2 border-l-4 border-[#FAD1A7] text-start text-base font-medium text-[#FAD1A7] bg-[#4e3424] focus:outline-none focus:text-[#FAD1A7] focus:bg-[#4e3424] focus:border-[#FAD1A7] transition duration-150 ease-in-out'
+                        : 'block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium text-white hover:text-[#FAD1A7] hover:bg-[#4e3424] focus:outline-none transition duration-150 ease-in-out' }}"
+            >
+                <svg class="inline-block w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+                Favoritos
+            </a>
 
-                <!-- Example Collections -->
-                <button 
-                    @click="activeCollection = '1'"
-                    :class="activeCollection === '1' ? 'border-[#FAD1A7] text-[#FAD1A7] bg-[#4e3424]' : 'border-transparent text-white hover:text-[#FAD1A7] hover:bg-[#4e3424]'"
-                    class="block w-full ps-3 pe-4 py-2 border-l-4 text-start text-base font-medium focus:outline-none transition duration-150 ease-in-out"
-                >
-                    <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-                    </svg>
-                    Programación
-                </button>
-
-                <button 
-                    @click="activeCollection = '2'"
-                    :class="activeCollection === '2' ? 'border-[#FAD1A7] text-[#FAD1A7] bg-[#4e3424]' : 'border-transparent text-white hover:text-[#FAD1A7] hover:bg-[#4e3424]'"
-                    class="block w-full ps-3 pe-4 py-2 border-l-4 text-start text-base font-medium focus:outline-none transition duration-150 ease-in-out"
-                >
-                    <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
-                    </svg>
-                    Ciencia Ficción
-                </button>
-
-                <!-- Create New Collection Button -->
-                <button 
-                    @click="showCreateModal = true"
-                    class="block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium bg-[#FAD1A7] text-[#3A271B] hover:bg-[#e6c196] focus:outline-none transition duration-150 ease-in-out"
-                >
-                    <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    Nueva Colección
-                </button>
+            <!-- Dynamic User Collections -->
+            @if(isset($userCollections))
+                @foreach($userCollections as $collection)
+                    <a 
+                        href="{{ route('book-collections.show', $collection->id) }}"
+                        class="{{ request()->routeIs('book-collections.show') && request()->route('bookCollection')?->id == $collection->id
+                                ? 'block w-full ps-3 pe-4 py-2 border-l-4 border-[#FAD1A7] text-start text-base font-medium text-[#FAD1A7] bg-[#4e3424] focus:outline-none focus:text-[#FAD1A7] focus:bg-[#4e3424] focus:border-[#FAD1A7] transition duration-150 ease-in-out'
+                                : 'block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium text-white hover:text-[#FAD1A7] hover:bg-[#4e3424] focus:outline-none transition duration-150 ease-in-out' }}"
+                    >
+                        <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+                        </svg>
+                        {{ $collection->name }}
+                    </a>
+                @endforeach
             @endif
+
+            <!-- Create New Collection Button -->
+            <button 
+                @click="showCreateModal = true"
+                class="block w-full ps-3 pe-4 py-2 border-l-4 border-transparent text-start text-base font-medium bg-[#FAD1A7] text-[#3A271B] hover:bg-[#e6c196] focus:outline-none transition duration-150 ease-in-out"
+            >
+                <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Nueva Colección
+            </button>
         </div>
 
         <!-- Responsive Settings Options -->
@@ -250,7 +230,7 @@
                     x-model="newCollectionName"
                     placeholder="Ej: Mis libros favoritos, Para leer..."
                     class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FAD1A7] focus:border-[#FAD1A7] transition-all"
-                    @keydown.enter="if(newCollectionName.trim()) { console.log('Creating:', newCollectionName); newCollectionName = ''; showCreateModal = false; alert('Colección creada'); }"
+                    @keydown.enter="createCollection()"
                 />
             </div>
 
@@ -263,7 +243,7 @@
                     Cancelar
                 </button>
                 <button 
-                    @click="if(newCollectionName.trim()) { console.log('Creating:', newCollectionName); newCollectionName = ''; showCreateModal = false; alert('Colección creada'); } else { alert('Por favor ingresa un nombre'); }"
+                    @click="createCollection()"
                     class="px-6 py-2 bg-[#3A271B] text-white rounded-lg hover:bg-[#2a1f15] transition-all font-semibold"
                 >
                     Crear Colección
@@ -271,4 +251,49 @@
             </div>
         </div>
     </div>
+
+    <!-- Alpine.js Script for Navigation -->
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('navigationData', () => ({
+                open: false,
+                showCreateModal: false,
+                newCollectionName: '',
+
+                async createCollection() {
+                    if (!this.newCollectionName.trim()) {
+                        alert('Por favor ingresa un nombre para la colección');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/book-collections', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                name: this.newCollectionName
+                            })
+                        });
+
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.newCollectionName = '';
+                            this.showCreateModal = false;
+                            location.reload(); // Refresh to update navigation
+                        } else {
+                            alert('Error al crear la colección');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('Error al crear la colección');
+                    }
+                }
+            }));
+        });
+    </script>
 </nav>
