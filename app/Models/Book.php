@@ -12,7 +12,7 @@ class Book extends Model
     /** @use HasFactory<\Database\Factories\BookFactory> */
     use HasFactory;
 
-     protected $fillable = [
+    protected $fillable = [
         'title',
         'authors',
         'isbn',
@@ -51,9 +51,12 @@ class Book extends Model
         return $this->belongsToMany(BookCollection::class)->withTimestamps();
     }
 
+    /**
+     * Relación muchos a muchos con User (favoritos)
+     */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'book_user')->withTimestamps();
     }
-
 }
+

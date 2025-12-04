@@ -23,5 +23,13 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::defaultView('vendor.pagination.tailwind');
         Paginator::defaultSimpleView('vendor.pagination.simple-tailwind');
+
+        // Share user collections with navigation across all views
+        view()->composer('layouts.navigation', function ($view) {
+            if (auth()->check()) {
+                $userCollections = auth()->user()->bookCollections()->withCount('books')->get();
+                $view->with('userCollections', $userCollections);
+            }
+        });
     }
 }

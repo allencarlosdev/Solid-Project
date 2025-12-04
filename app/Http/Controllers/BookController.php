@@ -103,7 +103,17 @@ class BookController extends Controller
             // \Log::error('Error fetching books from Google API: ' . $response->body());
         }
 
-        return view('books.index', ['books' => $books]);
+        // Get user's collections
+        $userCollections = auth()->user()->bookCollections()->withCount('books')->get();
+        
+        // Get user's favorited book external IDs
+        $favoritedBookIds = auth()->user()->favorites()->pluck('external_id')->toArray();
+
+        return view('books.index', [
+            'books' => $books,
+            'userCollections' => $userCollections,
+            'favoritedBookIds' => $favoritedBookIds
+        ]);
     }
 
     /**
@@ -156,5 +166,105 @@ class BookController extends Controller
         }
         
         abort(404, 'Libro no encontrado en Google Books API.');
+    }
+
+    /**
+     * Display user's favorite books
+     */
+    public function favorites(Request $request): View
+    {
+        $user = auth()->user();
+        $favoriteBooks = $user->favorites;
+        
+        // Fetch complete book data from Google Books API
+        $booksData = $favoriteBooks->map(function ($book) {
+            if ($book->external_id) {
+                $apiUrl = "https://www.googleapis.com/books/v1/volumes/{$book->external_id}";
+                $apiKey = config('services.google_books.key');
+                
+                try {
+                    $response = Http::get($apiUrl, ['key' => $apiKey]);
+                    
+                    if ($response->successful()) {
+                        $item = $response->json();
+                        $volumeInfo = $item['volumeInfo'] ?? [];
+                        
+                        $coverUrl = $volumeInfo['imageLinks']['medium'] ?? 
+                                    $volumeInfo['imageLinks']['small'] ?? 
+                                    $volumeInfo['imageLinks']['thumbnail'] ?? null;
+                        
+                        if ($coverUrl) {
+                            $coverUrl = str_replace('http://', 'https://', $coverUrl);
+                        }
+                        
+                        return [
+                            'title' => $volumeInfo['title'] ?? $book->title,
+                            'authors' => $volumeInfo['authors'] ?? $book->authors ?? ['N/A'],
+                            'publisher' => $volumeInfo['publisher'] ?? 'N/A',
+                            'publishedDate' => $volumeInfo['publishedDate'] ?? 'N/A',
+                            'cover_url' => $coverUrl,
+                            'external_id' => $item['id'] ?? $book->external_id,
+                            'description' => $volumeInfo['description'] ?? 'No descripción disponible.',
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    // Fallback to database data
+                }
+            }
+            
+            return [
+                'title' => $book->title,
+                'authors' => $book->authors ?? ['N/A'],
+                'publisher' => 'N/A',
+                'publishedDate' => 'N/A',
+                'cover_url' => null,
+                'external_id' => $book->external_id,
+                'description' => 'No descripción disponible.',
+            ];
+        });
+        
+        return view('books.favorites', ['books' => $booksData]);
+    }
+
+    /**
+     * Toggle favorite status for a book
+     */
+    public function toggleFavorite(Request $request)
+    {
+        $validated = $request->validate([
+            'book_external_id' => 'required|string',
+        ]);
+
+        $user = auth()->user();
+        
+        // Find or create the book
+        $book = \App\Models\Book::firstOrCreate(
+            ['external_id' => $validated['book_external_id']],
+            ['title' => 'Pending', 'authors' => []]
+        );
+
+        // Toggle favorite
+        $isFavorited = $user->favorites()->where('book_id', $book->id)->exists();
+        
+        if ($isFavorited) {
+            $user->favorites()->detach($book->id);
+            $message = 'Libro removido de favoritos';
+            $favorited = false;
+        } else {
+            $user->favorites()->attach($book->id);
+            $message = 'Libro agregado a favoritos';
+            $favorited = true;
+        }
+
+        // Return JSON for AJAX requests
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'favorited' => $favorited
+            ]);
+        }
+
+        return redirect()->back()->with('success', $message);
     }
 }
