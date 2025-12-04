@@ -13,7 +13,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Registrar la implementación de BookApiInterface
+        $this->app->bind(
+            \App\Contracts\BookApiInterface::class,
+            \App\Services\GoogleBooksApiService::class
+        );
     }
 
     /**
