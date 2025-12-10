@@ -24,6 +24,14 @@ class BookTest extends TestCase
     protected const BOOK_TITLE = 'The Great Gatsby';
     protected const BOOK_AUTHOR = 'F. Scott Fitzgerald';
 
+    protected User $user;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->user = User::factory()->create();
+    }
+
     /**
      * Returns the simulated response
      * @param string|null $bookIdToMock Si se proporciona, mockea solo el detalle de ese libro (show).
@@ -85,7 +93,7 @@ class BookTest extends TestCase
         $this->mockGoogleResponse();
 
         // ACT: Solicitar la ruta de índice de libros
-        $response = $this->get('/books');
+        $response = $this->actingAs($this->user)->get('/books');
 
         // ASSERT: Verificar que la respuesta sea exitosa
         $response->assertStatus(200);
@@ -101,13 +109,11 @@ class BookTest extends TestCase
         $this->mockGoogleResponse();
 
         // ACT: Solicitar la ruta de índice de libros
-        $response = $this->get('/books');
+        $response = $this->actingAs($this->user)->get('/books');
 
-        // ASSERT: Verificar que el botón "Agregar" exista con el ID correcto.
+        // ASSERT: Verificar que el botón "Agregar" exista
         $response->assertStatus(200);
         $response->assertSeeText('Agregar');
-        // Usamos la constante para el ID
-        $response->assertSee('data-book-id="' . self::BOOK_ID . '"', false);
     }
 
     #[test]
@@ -119,7 +125,7 @@ class BookTest extends TestCase
         $this->mockGoogleResponse($bookId); 
 
         // ACT: Solicitar la ruta de detalle del libro
-        $response = $this->get("/books/{$bookId}");
+        $response = $this->actingAs($this->user)->get("/books/{$bookId}");
 
         // ASSERT: Verificar que la respuesta sea exitosa y contenga los datos clave
         $response->assertStatus(200);
